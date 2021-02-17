@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/nifi-tibco-jms-bundle.iml" filepath="$PROJECT_DIR$/nifi-tibco-jms-bundle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nifi-tibcojms-processors/nifi-tibcojms-processors.iml" filepath="$PROJECT_DIR$/nifi-tibcojms-processors/nifi-tibcojms-processors.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nifi-tibcojms-processors-nar/nifi-tibcojms-processors-nar.iml" filepath="$PROJECT_DIR$/nifi-tibcojms-processors-nar/nifi-tibcojms-processors-nar.iml" />
+    </modules>
+  </component>
+</project>
