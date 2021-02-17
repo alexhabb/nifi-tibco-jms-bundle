@@ -24,7 +24,7 @@
 
     <groupId>org.habbcode.nifi</groupId>
     <artifactId>nifi-tibco-jms-bundle</artifactId>
-    <version>1.0</version>
+    <version>1.12.1</version>
     <packaging>pom</packaging>
 
     <properties>

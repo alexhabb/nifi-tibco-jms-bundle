@@ -6,12 +6,11 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
-    <output url="file://$MODULE_DIR$/../nifi-tibcojms-processors-nar/target/classes" />
-    <output-test url="file://$MODULE_DIR$/../nifi-tibcojms-processors-nar/target/test-classes" />
-    <content url="file://$MODULE_DIR$/../nifi-tibcojms-processors-nar">
-      <sourceFolder url="file://$MODULE_DIR$/../nifi-tibcojms-processors-nar/src/main/resources" type="java-resource" />
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../nifi-tibcojms-processors-nar/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
