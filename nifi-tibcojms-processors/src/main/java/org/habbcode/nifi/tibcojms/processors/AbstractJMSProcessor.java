@@ -24,12 +24,11 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
-import org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryHandler;
-import org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProperties;
-import org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProvider;
+import org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryHandler;
+import org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryProperties;
+import org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryProvider;
 import org.habbcode.nifi.tibcojms.cf.JndiJmsConnectionFactoryHandler;
 import org.habbcode.nifi.tibcojms.cf.JndiJmsConnectionFactoryProperties;
-import org.habbcode.nifi.tibcojms.cf.JndiJmsConnectionFactoryProvider;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
@@ -51,8 +50,8 @@ import java.util.stream.Collectors;
  * Base JMS processor to support implementation of JMS producers and consumers.
  *
  * @param <T> the type of {@link JMSWorker} which could be {@link JMSPublisher} or {@link JMSConsumer}
- * @see PublishJMS
- * @see ConsumeJMS
+ * @see TibcoPublishJMS
+ * @see TibcoConsumeJMS
  * @see JMSConnectionFactoryProviderDefinition
  */
 public abstract class AbstractJMSProcessor<T extends JMSWorker> extends AbstractProcessor {
@@ -136,7 +135,7 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
     );
 
     static final List<PropertyDescriptor> JMS_CF_PROPERTIES = Collections.unmodifiableList(
-            JMSConnectionFactoryProperties.getPropertyDescriptors().stream()
+            TibcoJMSConnectionFactoryProperties.getPropertyDescriptors().stream()
                     .map(pd -> new PropertyDescriptor.Builder()
                             .fromPropertyDescriptor(pd)
                             .required(false)
@@ -223,8 +222,8 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
             connectionFactoryProvider = context.getProperty(CF_SERVICE).asControllerService(JMSConnectionFactoryProviderDefinition.class);
         } else if (context.getProperty(JndiJmsConnectionFactoryProperties.JNDI_CONNECTION_FACTORY_NAME).isSet()) {
             connectionFactoryProvider = new JndiJmsConnectionFactoryHandler(context, getLogger());
-        } else if (context.getProperty(JMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL).isSet()) {
-            connectionFactoryProvider = new JMSConnectionFactoryHandler(context, getLogger());
+        } else if (context.getProperty(TibcoJMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL).isSet()) {
+            connectionFactoryProvider = new TibcoJMSConnectionFactoryHandler(context, getLogger());
         } else {
             throw new ProcessException("No Connection Factory configured.");
         }
@@ -268,7 +267,7 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
     /**
      * This method essentially performs initialization of this Processor by
      * obtaining an instance of the {@link ConnectionFactory} from the
-     * {@link JMSConnectionFactoryProvider} (ControllerService) and performing a
+     * {@link TibcoJMSConnectionFactoryProvider} (ControllerService) and performing a
      * series of {@link ConnectionFactory} adaptations which eventually results
      * in an instance of the {@link CachingConnectionFactory} used to construct
      * {@link JmsTemplate} used by this Processor.
@@ -320,7 +319,7 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
 
             connectionFactoryServiceProperty = validationContext.getProperty(CF_SERVICE);
             jndiInitialContextFactoryProperty = validationContext.getProperty(JndiJmsConnectionFactoryProperties.JNDI_INITIAL_CONTEXT_FACTORY);
-            jmsConnectionFactoryImplProperty = validationContext.getProperty(JMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL);
+            jmsConnectionFactoryImplProperty = validationContext.getProperty(TibcoJMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL);
         }
 
         List<ValidationResult> validateConnectionFactoryConfig() {
@@ -331,7 +330,7 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
                         .subject("Connection Factory config")
                         .valid(false)
                         .explanation(String.format("either '%s', '%s' or '%s' must be specified.", CF_SERVICE.getDisplayName(),
-                                JndiJmsConnectionFactoryProperties.JNDI_INITIAL_CONTEXT_FACTORY.getDisplayName(), JMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL.getDisplayName()))
+                                JndiJmsConnectionFactoryProperties.JNDI_INITIAL_CONTEXT_FACTORY.getDisplayName(), TibcoJMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL.getDisplayName()))
                         .build());
             } else if (connectionFactoryServiceProperty.isSet()) {
                 if (hasLocalJndiJmsConnectionFactoryConfig()) {
@@ -357,7 +356,7 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
             } else if (jndiInitialContextFactoryProperty.isSet()) {
                 validateLocalConnectionFactoryConfig(JndiJmsConnectionFactoryProperties.getPropertyDescriptors(), JndiJmsConnectionFactoryProperties.JNDI_INITIAL_CONTEXT_FACTORY, results);
             } else if (jmsConnectionFactoryImplProperty.isSet()) {
-                validateLocalConnectionFactoryConfig(JMSConnectionFactoryProperties.getPropertyDescriptors(), JMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL, results);
+                validateLocalConnectionFactoryConfig(TibcoJMSConnectionFactoryProperties.getPropertyDescriptors(), TibcoJMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL, results);
             }
 
             return results;
@@ -368,7 +367,7 @@ public abstract class AbstractJMSProcessor<T extends JMSWorker> extends Abstract
         }
 
         private boolean hasLocalJMSConnectionFactoryConfig() {
-            return hasLocalConnectionFactoryConfig(JMSConnectionFactoryProperties.getPropertyDescriptors());
+            return hasLocalConnectionFactoryConfig(TibcoJMSConnectionFactoryProperties.getPropertyDescriptors());
         }
 
         private boolean hasLocalConnectionFactoryConfig(List<PropertyDescriptor> localConnectionFactoryProperties) {

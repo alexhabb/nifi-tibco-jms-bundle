@@ -26,7 +26,7 @@ import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.stream.io.StreamUtils;
 //import org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProvider;
-import org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProvider;
+import org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryProvider;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.JmsHeaders;
@@ -79,9 +79,9 @@ import java.util.regex.Pattern;
         description = "Additional configuration property for the Connection Factory. It can be used when the Connection Factory is being configured via the 'JNDI *' or the 'JMS *'" +
                 "properties of the processor. For more information, see the Additional Details page.",
         expressionLanguageScope = ExpressionLanguageScope.VARIABLE_REGISTRY)
-@SeeAlso(value = { ConsumeJMS.class, JMSConnectionFactoryProvider.class })
+@SeeAlso(value = { TibcoConsumeJMS.class, TibcoJMSConnectionFactoryProvider.class })
 @SystemResourceConsideration(resource = SystemResource.MEMORY)
-public class PublishJMS extends AbstractJMSProcessor<JMSPublisher> {
+public class TibcoPublishJMS extends AbstractJMSProcessor<JMSPublisher> {
 
     static final PropertyDescriptor MESSAGE_BODY = new PropertyDescriptor.Builder()
             .name("message-body-type")

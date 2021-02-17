@@ -31,7 +31,7 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.JmsHeaders;
 
-import org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProvider;
+import org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryProvider;
 import org.habbcode.nifi.tibcojms.processors.JMSConsumer.ConsumerCallback;
 import org.habbcode.nifi.tibcojms.processors.JMSConsumer.JMSResponse;
 
@@ -70,15 +70,15 @@ import java.util.concurrent.TimeUnit;
         @WritesAttribute(attribute = JmsHeaders.TYPE, description = "The JMSType from the message header."),
         @WritesAttribute(attribute = JmsHeaders.REPLY_TO, description = "The JMSReplyTo from the message header."),
         @WritesAttribute(attribute = JmsHeaders.DESTINATION, description = "The JMSDestination from the message header."),
-        @WritesAttribute(attribute = ConsumeJMS.JMS_MESSAGETYPE, description = "The JMS message type, can be TextMessage, BytesMessage, ObjectMessage, MapMessage or StreamMessage)."),
+        @WritesAttribute(attribute = TibcoConsumeJMS.JMS_MESSAGETYPE, description = "The JMS message type, can be TextMessage, BytesMessage, ObjectMessage, MapMessage or StreamMessage)."),
         @WritesAttribute(attribute = "other attributes", description = "Each message property is written to an attribute.")
 })
 @DynamicProperty(name = "The name of a Connection Factory configuration property.", value = "The value of a given Connection Factory configuration property.",
         description = "Additional configuration property for the Connection Factory. It can be used when the Connection Factory is being configured via the 'JNDI *' or the 'JMS *'" +
                 "properties of the processor. For more information, see the Additional Details page.",
         expressionLanguageScope = ExpressionLanguageScope.VARIABLE_REGISTRY)
-@SeeAlso(value = { PublishJMS.class, JMSConnectionFactoryProvider.class })
-public class ConsumeJMS extends AbstractJMSProcessor<JMSConsumer> {
+@SeeAlso(value = { TibcoPublishJMS.class, TibcoJMSConnectionFactoryProvider.class })
+public class TibcoConsumeJMS extends AbstractJMSProcessor<JMSConsumer> {
     public static final String JMS_MESSAGETYPE = "jms.messagetype";
 
     static final AllowableValue AUTO_ACK = new AllowableValue(String.valueOf(Session.AUTO_ACKNOWLEDGE),
@@ -272,8 +272,8 @@ public class ConsumeJMS extends AbstractJMSProcessor<JMSConsumer> {
                     final Map<String, String> jmsHeaders = response.getMessageHeaders();
                     final Map<String, String> jmsProperties = response.getMessageProperties();
 
-                    flowFile = ConsumeJMS.this.updateFlowFileAttributesWithJMSAttributes(jmsHeaders, flowFile, processSession);
-                    flowFile = ConsumeJMS.this.updateFlowFileAttributesWithJMSAttributes(jmsProperties, flowFile, processSession);
+                    flowFile = TibcoConsumeJMS.this.updateFlowFileAttributesWithJMSAttributes(jmsHeaders, flowFile, processSession);
+                    flowFile = TibcoConsumeJMS.this.updateFlowFileAttributesWithJMSAttributes(jmsProperties, flowFile, processSession);
                     flowFile = processSession.putAttribute(flowFile, JMS_SOURCE_DESTINATION_NAME, destinationName);
 
                     processSession.getProvenanceReporter().receive(flowFile, destinationName);

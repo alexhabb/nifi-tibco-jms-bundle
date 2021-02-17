@@ -3,10 +3,6 @@ package org.habbcode.nifi.tibcojms.cf;
  *   Alexandr Mikhaylov created on 16.02.2021 inside the package - org.habbcode.nifi.tibcojms.cf
  */
 
-//import static org.apache.nifi.jms.cf.JMSConnectionFactoryProperties.JMS_BROKER_URI;
-//import static org.apache.nifi.jms.cf.JMSConnectionFactoryProperties.JMS_CONNECTION_FACTORY_IMPL;
-//import static org.apache.nifi.jms.cf.JMSConnectionFactoryProperties.JMS_SSL_CONTEXT_SERVICE;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,26 +18,26 @@ import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.security.util.ClientAuth;
 import org.apache.nifi.ssl.SSLContextService;
 
-import static org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProperties.*;
+import static org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryProperties.*;
 
 /**
  * Handler class to create a JMS Connection Factory by instantiating the vendor specific javax.jms.ConnectionFactory
  * implementation class and configuring the Connection Factory object directly.
  * The handler can be used from controller services and processors as well.
  */
-public class JMSConnectionFactoryHandler implements IJMSConnectionFactoryProvider {
+public class TibcoJMSConnectionFactoryHandler implements IJMSConnectionFactoryProvider {
 
     private final PropertyContext context;
     private final Set<PropertyDescriptor> propertyDescriptors;
     private final ComponentLog logger;
 
-    public JMSConnectionFactoryHandler(ConfigurationContext context, ComponentLog logger) {
+    public TibcoJMSConnectionFactoryHandler(ConfigurationContext context, ComponentLog logger) {
         this.context = context;
         this.propertyDescriptors = context.getProperties().keySet();
         this.logger = logger;
     }
 
-    public JMSConnectionFactoryHandler(ProcessContext context, ComponentLog logger) {
+    public TibcoJMSConnectionFactoryHandler(ProcessContext context, ComponentLog logger) {
         this.context = context;
         this.propertyDescriptors = context.getProperties().keySet();
         this.logger = logger;
@@ -121,43 +117,17 @@ public class JMSConnectionFactoryHandler implements IJMSConnectionFactoryProvide
      * All other properties are set as dynamic properties where user essentially
      * provides both property name and value.
      *
-     * @see <a href="http://activemq.apache.org/maven/apidocs/org/apache/activemq/ActiveMQConnectionFactory.html#setBrokerURL-java.lang.String-">setBrokerURL(String brokerURL)</a>
      * @see <a href="https://docs.tibco.com/pub/enterprise_message_service/8.1.0/doc/html/tib_ems_api_reference/api/javadoc/com/tibco/tibjms/TibjmsConnectionFactory.html#setServerUrl(java.lang.String)">setServerUrl(String serverUrl)</a>
-     * @see <a href="https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.1.0/com.ibm.mq.javadoc.doc/WMQJMSClasses/com/ibm/mq/jms/MQConnectionFactory.html#setHostName_java.lang.String_">setHostName(String hostname)</a>
-     * @see <a href="https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.1.0/com.ibm.mq.javadoc.doc/WMQJMSClasses/com/ibm/mq/jms/MQConnectionFactory.html#setPort_int_">setPort(int port)</a>
-     * @see <a href="https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.1.0/com.ibm.mq.javadoc.doc/WMQJMSClasses/com/ibm/mq/jms/MQConnectionFactory.html#setConnectionNameList_java.lang.String_">setConnectionNameList(String hosts)</a>
      * @see #setProperty(String propertyName, Object propertyValue)
      */
     void setConnectionFactoryProperties() {
         if (context.getProperty(JMS_BROKER_URI).isSet()) {
             String brokerValue = context.getProperty(JMS_BROKER_URI).evaluateAttributeExpressions().getValue();
             String connectionFactoryValue = context.getProperty(JMS_CONNECTION_FACTORY_IMPL).evaluateAttributeExpressions().getValue();
-            if (connectionFactoryValue.startsWith("org.apache.activemq")) {
-                setProperty("brokerURL", brokerValue);
-            } else if (connectionFactoryValue.startsWith("com.tibco.tibjms")) {
+            if (connectionFactoryValue.startsWith("com.tibco.tibjms")) {
                 setProperty("serverUrl", brokerValue);
-            } else {
-                String[] brokerList = brokerValue.split(",");
-                if (connectionFactoryValue.startsWith("com.ibm.mq.jms")) {
-                    List<String> ibmConList = new ArrayList<String>();
-                    for (String broker : brokerList) {
-                        String[] hostPort = broker.split(":");
-                        if (hostPort.length == 2) {
-                            ibmConList.add(hostPort[0] + "(" + hostPort[1] + ")");
-                        } else {
-                            ibmConList.add(broker);
-                        }
-                    }
-                    setProperty("connectionNameList", String.join(",", ibmConList));
-                } else {
-                    // Try to parse broker URI as colon separated host/port pair. Use first pair if multiple given.
-                    String[] hostPort = brokerList[0].split(":");
-                    if (hostPort.length == 2) {
-                        // If broker URI indeed was colon separated host/port pair
-                        setProperty("hostName", hostPort[0]);
-                        setProperty("port", hostPort[1]);
-                    }
-                }
+                setProperty("SSLEnableVerifyHost", Boolean.parseBoolean(context.getProperty(TIBCO_ENABLE_VERIFY_HOST).evaluateAttributeExpressions().getValue()) );
+                setProperty("SSLEnableVerifyHostName", Boolean.parseBoolean(context.getProperty(TIBCO_ENABLE_VERIFY_HOST_NAME).evaluateAttributeExpressions().getValue()));
             }
         }
 

@@ -13,4 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-org.habbcode.nifi.tibcojms.cf.JMSConnectionFactoryProvider
+org.habbcode.nifi.tibcojms.cf.TibcoJMSConnectionFactoryProvider

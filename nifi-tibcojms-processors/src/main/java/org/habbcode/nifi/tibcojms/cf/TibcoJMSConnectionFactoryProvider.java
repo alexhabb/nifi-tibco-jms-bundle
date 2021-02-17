@@ -24,9 +24,9 @@ import java.util.List;
  * <p>
  * It accomplishes it by adjusting current classpath by adding to it the
  * additional resources (i.e., JMS client libraries) provided by the user via
- * {@link JMSConnectionFactoryProperties#JMS_CLIENT_LIBRARIES}, allowing it then to create an instance of the
+ * {@link TibcoJMSConnectionFactoryProperties#JMS_CLIENT_LIBRARIES}, allowing it then to create an instance of the
  * target {@link ConnectionFactory} based on the provided
- * {@link JMSConnectionFactoryProperties#JMS_CONNECTION_FACTORY_IMPL} which can be than access via
+ * {@link TibcoJMSConnectionFactoryProperties#JMS_CONNECTION_FACTORY_IMPL} which can be than access via
  * {@link #getConnectionFactory()} method.
  */
 @Tags({"jms", "messaging", "integration", "queue", "topic", "publish", "subscribe"})
@@ -38,23 +38,23 @@ import java.util.List;
                 + "property and 'com.ibm.mq.jms.MQConnectionFactory.setTransportType(int)' would imply 'transportType' property.",
         expressionLanguageScope = ExpressionLanguageScope.VARIABLE_REGISTRY)
 @SeeAlso(classNames = {"org.apache.nifi.jms.processors.ConsumeJMS", "org.apache.nifi.jms.processors.PublishJMS"})
-public class JMSConnectionFactoryProvider extends AbstractControllerService implements JMSConnectionFactoryProviderDefinition {
+public class TibcoJMSConnectionFactoryProvider extends AbstractControllerService implements JMSConnectionFactoryProviderDefinition {
 
-    protected volatile JMSConnectionFactoryHandler delegate;
+    protected volatile TibcoJMSConnectionFactoryHandler delegate;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return JMSConnectionFactoryProperties.getPropertyDescriptors();
+        return TibcoJMSConnectionFactoryProperties.getPropertyDescriptors();
     }
 
     @Override
     protected PropertyDescriptor getSupportedDynamicPropertyDescriptor(final String propertyDescriptorName) {
-        return JMSConnectionFactoryProperties.getDynamicPropertyDescriptor(propertyDescriptorName);
+        return TibcoJMSConnectionFactoryProperties.getDynamicPropertyDescriptor(propertyDescriptorName);
     }
 
     @OnEnabled
     public void onEnabled(ConfigurationContext context) {
-        delegate = new JMSConnectionFactoryHandler(context, getLogger());
+        delegate = new TibcoJMSConnectionFactoryHandler(context, getLogger());
     }
 
     @OnDisabled
